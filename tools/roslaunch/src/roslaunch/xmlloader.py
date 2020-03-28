@@ -620,6 +620,8 @@ class XmlLoader(loader.Loader):
                 
         try:
             launch = self._parse_launch(inc_filename, verbose=verbose)
+            # NOTE: inc_filename 应该与获得文件名相关
+            # launch 与 tag 处理相关
             ros_config.add_roslaunch_file(inc_filename)
             self._launch_tag(launch, ros_config, filename=inc_filename)
             default_machine = \
