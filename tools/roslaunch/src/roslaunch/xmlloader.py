@@ -174,13 +174,16 @@ class XmlLoader(loader.Loader):
         self.root_context = None
         self.resolve_anon = resolve_anon
 
+    # NOTE: 从 tag 中解析文件名
     def resolve_args(self, args, context):
         """
         Wrapper around substitution_args.resolve_args to set common parameters
         """
         # resolve_args gets called a lot, so we optimize by testing for dollar sign before resolving
         if args and '$' in args:
+            # NOTE: 如果有涉及到其他包名
             return substitution_args.resolve_args(args, context=context.resolve_dict, resolve_anon=self.resolve_anon)
+            # 返回系统绝对路径
         else:
             return args
 
@@ -722,6 +725,7 @@ class XmlLoader(loader.Loader):
             print("WARNING: ignoring defunct <master /> tag", file=sys.stderr)
         self._recurse_load(ros_config, launch.childNodes, self.root_context, None, is_core, verbose)
         
+    # NOTE: 解析 tag 通过 getElementsByTagName
     def _parse_launch(self, filename, verbose):
         try:
             if verbose:            

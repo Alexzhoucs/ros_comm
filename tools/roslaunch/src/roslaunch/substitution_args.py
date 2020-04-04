@@ -124,6 +124,7 @@ def _eval_find(pkg):
     return rp.get_path(pkg)
 
 def _find(resolved, a, args, context):
+    # NOTE: 单独测试
     """
     process $(find PKG)
     Resolves the path while considering the path following the command to provide backward compatible results.
@@ -165,6 +166,7 @@ def _find(resolved, a, args, context):
             return res
     pkg_path = rp.get_path(args[0])
     if path:
+        # NOTE: 粘合路径
         pkg_path = os.path.join(pkg_path, path)
     return before + pkg_path + after
 
@@ -325,6 +327,7 @@ def _eval(s, context):
         raise SubstitutionException("$(eval ...) may not contain double underscore expressions")
     return str(eval(s, {}, _DictWrapper(context['arg'], functions)))
 
+# NOTE: 处理涉及其他包的地址
 def resolve_args(arg_str, context=None, resolve_anon=True):
     """
     Resolves substitution args (see wiki spec U{http://ros.org/wiki/roslaunch}).
@@ -365,6 +368,7 @@ def resolve_args(arg_str, context=None, resolve_anon=True):
     resolved = _resolve_args(arg_str, context, resolve_anon, commands)
     # then resolve 'find' as it requires the subsequent path to be expanded already
     commands = {
+        # NOTE: 调用此处
         'find': _find,
     }
     resolved = _resolve_args(resolved, context, resolve_anon, commands)
@@ -377,17 +381,20 @@ def _resolve_args(arg_str, context, resolve_anon, commands):
         splits = [s for s in a.split(' ') if s]
         if not splits[0] in valid:
             raise SubstitutionException("Unknown substitution command [%s]. Valid commands are %s"%(a, valid))
+        # NOTE: 拆出命令与参数
         command = splits[0]
         args = splits[1:]
         if command in commands:
             resolved = commands[command](resolved, a, args, context)
     return resolved
+    # 是个string 记录系统的绝对路径
 
 _OUT  = 0
 _DOLLAR = 1
 _LP = 2
 _IN = 3
 def _collect_args(arg_str):
+    # NOTE: 摘出由 $(  ) 包含的部分
     """
     State-machine parser for resolve_args. Substitution args are of the form:
     $(find package_name)/scripts/foo.py $(export some/attribute blar) non-relevant stuff
